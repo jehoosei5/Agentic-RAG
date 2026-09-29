@@ -1,0 +1,54 @@
+LANGGRAPH EDGES
+
+Edges define the connections between nodes in a LangGraph.
+
+A normal edge always moves execution from one node to another.
+
+Example:
+
+graph.add_edge("retrieve", "generate")
+
+This means that after retrieve finishes, generate will execute.
+
+The START node represents the beginning of graph execution.
+
+The END node represents the completion of graph execution.
+
+Example:
+
+graph.add_edge(START, "analyze")
+graph.add_edge("generate", END)
+
+A graph can contain multiple sequential nodes.
+
+Example:
+
+START
+  |
+  v
+analyze
+  |
+  v
+retrieve
+  |
+  v
+generate
+  |
+  v
+END
+
+Conditional edges allow the graph to choose the next node dynamically.
+
+The routing function examines the current state and returns a destination.
+
+Example:
+
+def route(state):
+    if state["needs_retrieval"]:
+        return "retrieve"
+
+    return "generate"
+
+A conditional edge can then connect the routing function to possible destinations.
+
+Edges are responsible for controlling graph execution flow.

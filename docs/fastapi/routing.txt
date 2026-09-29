@@ -1,0 +1,66 @@
+FASTAPI ROUTING
+
+FastAPI uses path operation decorators to connect HTTP requests to Python functions.
+
+Common HTTP methods include GET, POST, PUT, PATCH, and DELETE.
+
+Example:
+
+@app.get("/users")
+def get_users():
+    return {"users": []}
+
+The @app.get decorator registers the function as a handler for GET requests made to /users.
+
+Path parameters allow dynamic values to be included in a URL.
+
+Example:
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    return {"user_id": user_id}
+
+In this example, user_id is extracted from the URL and converted to an integer because the function annotation specifies int.
+
+Query parameters are values provided after a question mark in the URL.
+
+Example:
+
+@app.get("/users")
+def get_users(limit: int = 10):
+    return {"limit": limit}
+
+A request such as /users?limit=20 passes 20 to the limit parameter.
+
+FastAPI automatically validates path and query parameters using Python type annotations and Pydantic.
+
+APIRouter can be used to organize routes into separate modules.
+
+Example:
+
+router = APIRouter(prefix="/users")
+
+@router.get("/")
+def get_users():
+    return {"users": []}
+
+The router can then be included in the main FastAPI application using app.include_router(router).
+
+FastAPI supports response_model for controlling and validating the structure of returned data.
+
+Example:
+
+@app.get("/users/{user_id}", response_model=UserResponse)
+def get_user(user_id: int):
+    ...
+
+HTTPException can be used when an endpoint needs to return an HTTP error.
+
+Example:
+
+raise HTTPException(
+    status_code=404,
+    detail="User not found"
+)
+
+The exception must be raised with the raise keyword.

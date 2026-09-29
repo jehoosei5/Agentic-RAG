@@ -1,0 +1,54 @@
+COMPANY CODING STANDARDS
+
+Python code should follow PEP 8 conventions where practical.
+
+Functions should have descriptive names that communicate their purpose.
+
+Example:
+
+def get_current_user():
+    ...
+
+is preferred over:
+
+def process():
+    ...
+
+API endpoints should use appropriate HTTP methods.
+
+GET should generally retrieve resources.
+
+POST should generally create resources.
+
+PUT or PATCH should update resources.
+
+DELETE should remove resources.
+
+Errors should be handled explicitly.
+
+FastAPI HTTPException should be used for expected HTTP errors.
+
+Example:
+
+raise HTTPException(
+    status_code=404,
+    detail="Resource not found"
+)
+
+Database sessions should be properly closed after use.
+
+Passwords must never be stored in plain text.
+
+Sensitive configuration such as API keys and database passwords should not be hard-coded into source code.
+
+Environment variables should be used for sensitive configuration.
+
+Functions should generally have a single clear responsibility.
+
+Large functions should be broken into smaller components when doing so improves readability and testing.
+
+Type hints should be used for function parameters and return values when practical.
+
+Code should be tested before being merged.
+
+Comments should explain why non-obvious logic exists rather than simply restating what the code does.

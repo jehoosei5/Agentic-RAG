@@ -1,0 +1,49 @@
+COMPANY DEPLOYMENT
+
+Applications are deployed using containerized services.
+
+The typical deployment pipeline is:
+
+Developer
+   |
+   v
+Git Repository
+   |
+   v
+CI Pipeline
+   |
+   v
+Automated Tests
+   |
+   v
+Docker Build
+   |
+   v
+Container Registry
+   |
+   v
+Production Environment
+
+Environment-specific configuration should not be hard-coded into the application.
+
+Development, staging, and production environments may use different databases and external services.
+
+Environment variables are used to provide configuration at runtime.
+
+Production deployments should run automated tests before deployment.
+
+Docker images should contain the application and its required runtime dependencies.
+
+The application should expose a health-check endpoint.
+
+A health-check endpoint allows infrastructure to determine whether the application is running correctly.
+
+Logs should be written in a format that can be collected by the deployment platform.
+
+Production applications should not expose sensitive credentials in logs.
+
+Database migrations should be executed carefully when deploying schema changes.
+
+A deployment should be reversible where possible.
+
+Staging environments should be used to validate significant changes before production deployment.

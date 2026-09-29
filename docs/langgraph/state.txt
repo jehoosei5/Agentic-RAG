@@ -1,0 +1,50 @@
+LANGGRAPH STATE
+
+LangGraph uses state to store information that is shared between nodes during graph execution.
+
+A state can be represented using TypedDict, Pydantic models, or other supported schemas.
+
+Example:
+
+class State(TypedDict):
+    question: str
+    answer: str
+    documents: list
+
+Each node receives the current state and can return updates to the state.
+
+Example:
+
+def process_question(state: State):
+    question = state["question"]
+
+    return {
+        "answer": "Processed question"
+    }
+
+The returned dictionary is merged into the graph state according to the graph's state schema.
+
+State allows different nodes to communicate without directly calling one another.
+
+For example:
+
+Node A can place retrieved documents into state.
+
+Node B can read those documents and generate an answer.
+
+Node C can evaluate the answer and update the state with a grading result.
+
+A state can contain messages when building conversational applications.
+
+Example:
+
+class State(TypedDict):
+    messages: list
+
+Message-based state is useful for agents because the conversation history can be passed between nodes.
+
+State should contain information needed by multiple parts of the workflow.
+
+Temporary implementation details that are only needed inside a single function do not necessarily need to be stored in graph state.
+
+When multiple workers update the same state field, an appropriate reducer may be required to combine the values.

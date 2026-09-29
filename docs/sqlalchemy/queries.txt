@@ -1,0 +1,65 @@
+SQLALCHEMY QUERIES
+
+SQLAlchemy provides several ways to retrieve data from a database.
+
+A traditional ORM query can be written as:
+
+db.query(User).all()
+
+This returns all User records.
+
+Filtering can be performed using filter.
+
+Example:
+
+db.query(User).filter(User.email == email).first()
+
+first() returns the first matching object or None when no matching record exists.
+
+all() returns all matching records.
+
+filter_by() can also be used for simple equality-based filtering.
+
+Example:
+
+db.query(User).filter_by(email=email).first()
+
+Multiple conditions can be combined.
+
+Example:
+
+db.query(User).filter(
+    User.email == email,
+    User.active == True
+).first()
+
+Records can be created by constructing a model instance.
+
+Example:
+
+user = User(
+    name="John",
+    email="john@example.com"
+)
+
+The object is added to the session:
+
+db.add(user)
+
+Then the transaction is committed:
+
+db.commit()
+
+An existing record can be updated by modifying its attributes and committing the session.
+
+A record can be deleted using:
+
+db.delete(user)
+
+followed by:
+
+db.commit()
+
+SQLAlchemy also supports SQL expressions and the newer SQLAlchemy 2.0 select() style.
+
+Queries should be designed carefully to avoid unnecessary database calls and inefficient loading of related objects.

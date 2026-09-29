@@ -1,0 +1,53 @@
+LANGGRAPH NODES
+
+A node is a function that performs an operation in a LangGraph workflow.
+
+A node receives the current state and returns state updates.
+
+Example:
+
+def retrieve_documents(state):
+    question = state["question"]
+
+    documents = retriever.invoke(question)
+
+    return {
+        "documents": documents
+    }
+
+The node can then be added to a StateGraph.
+
+Example:
+
+graph.add_node("retrieve", retrieve_documents)
+
+Nodes can perform many types of operations.
+
+Examples include:
+
+- Calling an LLM
+- Calling a retriever
+- Calling an external API
+- Processing documents
+- Grading retrieved documents
+- Rewriting a query
+- Generating a final answer
+- Calling tools
+
+A node should generally perform one logical responsibility.
+
+For example, a retrieve node should retrieve documents rather than also generating the final answer.
+
+Separating responsibilities into nodes makes the graph easier to understand, test, and modify.
+
+Nodes can return partial state updates rather than returning the entire state.
+
+For example:
+
+return {
+    "documents": documents
+}
+
+This allows other state fields to remain unchanged.
+
+Nodes can also be asynchronous when they need to call asynchronous operations.

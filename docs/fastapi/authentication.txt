@@ -1,0 +1,55 @@
+FASTAPI AUTHENTICATION
+
+Authentication determines whether a user is who they claim to be.
+
+Authorization determines whether an authenticated user has permission to perform an action.
+
+FastAPI supports several authentication approaches, including OAuth2 and bearer tokens.
+
+A common architecture uses an OAuth2 password flow to obtain an access token.
+
+The client sends credentials to a login endpoint.
+
+The server verifies the credentials and creates an access token.
+
+The client then includes the token in subsequent requests.
+
+Example HTTP header:
+
+Authorization: Bearer <access_token>
+
+FastAPI provides OAuth2PasswordBearer for extracting bearer tokens from requests.
+
+Example:
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+An endpoint can obtain the token using:
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme)
+):
+    ...
+
+The token can then be decoded and validated.
+
+Passwords should not be stored as plain text.
+
+A password hashing algorithm such as bcrypt or Argon2 should be used to store password hashes.
+
+During login, the submitted password is compared with the stored password hash.
+
+A typical authentication flow is:
+
+1. Client submits username and password.
+2. Server finds the user.
+3. Server verifies the password.
+4. Server creates an access token.
+5. Client stores the access token.
+6. Client sends the token with subsequent requests.
+7. Server validates the token.
+8. Server identifies the current user.
+
+Authentication and authorization should be kept separate from business logic where practical.
+
+FastAPI dependencies are commonly used to implement reusable authentication checks.

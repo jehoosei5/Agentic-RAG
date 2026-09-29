@@ -1,0 +1,72 @@
+LANGGRAPH SEND API
+
+The Send API allows LangGraph to dynamically create tasks that execute a particular node with a custom state.
+
+Send is useful when the number of workers is determined dynamically at runtime.
+
+For example, an orchestrator may determine that a question requires research from three sources:
+
+- FastAPI
+- LangGraph
+- SQLAlchemy
+
+Instead of manually creating three fixed branches, the orchestrator can dynamically create worker tasks.
+
+Conceptually:
+
+orchestrator
+     |
+     +----> FastAPI worker
+     |
+     +----> LangGraph worker
+     |
+     +----> SQLAlchemy worker
+
+The workers can execute independently.
+
+Send is especially useful for map-reduce style workflows.
+
+The map phase distributes work to multiple workers.
+
+The reduce phase combines the results.
+
+For example:
+
+Question
+   |
+   v
+Orchestrator
+   |
+   +----> Worker A
+   |
+   +----> Worker B
+   |
+   +----> Worker C
+   |
+   v
+Combine Results
+
+The worker state does not necessarily need to have the same structure as the overall graph state.
+
+The orchestrator can pass only the information needed by each worker.
+
+For example, a worker may receive:
+
+{
+    "source": "fastapi",
+    "question": "How does authentication work?"
+}
+
+The worker searches only the FastAPI knowledge base and returns its findings.
+
+The final state can then combine the results from all workers.
+
+Send is useful when the number of tasks cannot be known when the graph is designed.
+
+For example:
+
+If the question requires two sources, create two workers.
+
+If the question requires four sources, create four workers.
+
+This makes Send particularly useful for multi-source research agents and Agentic RAG systems.

@@ -1,0 +1,69 @@
+LANGGRAPH CONDITIONAL EDGES
+
+Conditional edges allow a LangGraph workflow to make decisions about which node should execute next.
+
+A routing function receives the current state and returns a destination.
+
+Example:
+
+def route_question(state):
+    if state["needs_retrieval"]:
+        return "retrieve"
+
+    return "generate"
+
+The graph can connect this function to multiple destinations.
+
+Conceptually:
+
+graph.add_conditional_edges(
+    "analyze",
+    route_question,
+    {
+        "retrieve": "retrieve",
+        "generate": "generate"
+    }
+)
+
+Conditional edges are useful for agentic workflows because an LLM can make a decision that changes the graph's execution path.
+
+For example, an agent might determine that a question requires FastAPI documentation.
+
+The route can then be:
+
+analyze
+   |
+   v
+fastapi_retriever
+   |
+   v
+generate
+
+For another question, the same analyze node might determine that SQLAlchemy documentation is required.
+
+The route becomes:
+
+analyze
+   |
+   v
+sqlalchemy_retriever
+   |
+   v
+generate
+
+Conditional edges can also be used to create loops.
+
+Example:
+
+retrieve
+   |
+   v
+grade
+   |
+   +---- relevant ------> generate
+   |
+   +---- irrelevant ----> rewrite
+
+The rewrite node can then connect back to retrieve.
+
+This allows an agentic RAG system to retry retrieval with an improved query.

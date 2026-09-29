@@ -1,0 +1,40 @@
+FASTAPI MIDDLEWARE
+
+Middleware is code that runs around HTTP request processing.
+
+A middleware can execute logic before an endpoint is called and after the endpoint returns a response.
+
+Example:
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    print(f"Request: {request.method} {request.url}")
+
+    response = await call_next(request)
+
+    print(f"Status: {response.status_code}")
+
+    return response
+
+The call_next function passes the request to the next middleware or endpoint.
+
+Middleware can be used for logging, timing, authentication checks, request modification, response modification, and security-related processing.
+
+Middleware applies broadly to requests handled by the application.
+
+FastAPI applications can also use middleware supplied by Starlette.
+
+CORS middleware is commonly used when a frontend application hosted on another origin needs to communicate with the FastAPI backend.
+
+Example:
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://example.com"],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+Middleware should be used for cross-cutting behavior that applies to many or all requests.
+
+Function-specific logic is usually better implemented using dependencies or directly inside endpoint functions.

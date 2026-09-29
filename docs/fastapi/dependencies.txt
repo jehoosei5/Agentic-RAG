@@ -1,0 +1,52 @@
+FASTAPI DEPENDENCY INJECTION
+
+FastAPI provides a dependency injection system through the Depends function.
+
+Dependencies allow common functionality to be defined once and reused by multiple endpoints.
+
+Example:
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+An endpoint can request this dependency:
+
+@app.get("/users")
+def get_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
+
+FastAPI calls get_db automatically when the endpoint is executed.
+
+Dependencies can be used for database sessions, authentication, authorization, configuration, logging, and other shared functionality.
+
+Dependencies can depend on other dependencies.
+
+Example:
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    ...
+
+@app.get("/profile")
+def profile(user = Depends(get_current_user)):
+    return user
+
+FastAPI resolves the dependency chain automatically.
+
+Dependencies can also be applied to an entire router.
+
+Example:
+
+router = APIRouter(
+    prefix="/admin",
+    dependencies=[Depends(get_current_user)]
+)
+
+All routes inside this router will require the dependency.
+
+Dependency injection improves separation of concerns because endpoint functions do not need to manually construct shared resources.
+
+For database applications, a dependency commonly creates a database session before the request and closes it after the request completes.
