@@ -1,4 +1,5 @@
 from typing import Annotated
+import operator
 
 from typing_extensions import TypedDict
 
@@ -18,7 +19,7 @@ class AgentState(TypedDict):
 
     sources: list[str]
 
-    documents: list[Document]
+    documents: Annotated[list[Document], operator.add]
 
     answer: str
 
