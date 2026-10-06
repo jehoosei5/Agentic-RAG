@@ -91,3 +91,164 @@ def retrieve(state):
     return {
         "documents": documents
     }
+
+def retrieve_worker(state):
+
+    question = state["question"]
+
+    source = state["source"]
+
+    documents = retrieve_documents(
+        question=question,
+        source=source,
+    )
+
+    return {
+        "documents": documents
+    }
+
+
+def grade_documents(state):
+
+    question = state["question"]
+
+    documents = state.get(
+        "documents",
+        []
+    )
+
+    if not documents:
+
+        return {
+            "document_relevant": False
+        }
+
+    document_text = "\n\n".join(
+        doc.page_content
+        for doc in documents
+    )
+
+    structured_llm = llm.with_structured_output(
+        DocumentGrade
+    )
+
+    prompt = f"""
+You are a document relevance grader.
+
+Determine whether the retrieved documentation
+contains useful information for answering the question.
+
+Question:
+
+{question}
+
+Retrieved documentation:
+
+{document_text}
+
+Return relevant=true only if the documents
+contain information that can meaningfully
+help answer the question.
+"""
+
+    result = structured_llm.invoke(
+        prompt
+    )
+
+    return {
+        "document_relevant": result.relevant
+    }
+
+def rewrite_query(state):
+
+    question = state["question"]
+
+    structured_llm = llm.with_structured_output(
+        RewriteQuery
+    )
+
+    prompt = f"""
+You are a search query optimization agent.
+
+The documentation retrieved for the user's
+question was not relevant enough.
+
+Rewrite the question into a more precise
+technical search query.
+
+Original question:
+
+{question}
+
+Return only the improved search query.
+"""
+
+    result = structured_llm.invoke(
+        prompt
+    )
+
+    return {
+        "question": result.rewritten_question,
+        "rewritten_question": (
+            result.rewritten_question
+        ),
+        "retry_count": (
+            state.get("retry_count", 0) + 1
+        ),
+    }
+
+
+def generate_answer(state):
+
+    question = state["question"]
+
+    documents = state.get(
+        "documents",
+        []
+    )
+
+    if documents:
+
+        context = "\n\n".join(
+            f"""
+SOURCE: {doc.metadata.get("source")}
+DOCUMENT: {doc.metadata.get("document")}
+
+{doc.page_content}
+"""
+            for doc in documents
+        )
+
+    else:
+        context = "No documentation was retrieved."
+
+    prompt = f"""
+You are a technical documentation assistant.
+
+Answer the user's question.
+
+If documentation is provided, use it as the
+primary source of truth.
+
+Do not invent facts that are not supported
+by the documentation.
+
+If the documentation does not contain enough
+information, clearly say so.
+
+Question:
+
+{question}
+
+Documentation:
+
+{context}
+"""
+
+    response = llm.invoke(
+        prompt
+    )
+
+    return {
+        "answer": response.content
+    }
