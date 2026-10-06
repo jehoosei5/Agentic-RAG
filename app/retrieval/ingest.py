@@ -2,7 +2,6 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 
 from app.config import (
@@ -60,14 +59,10 @@ def create_vector_store():
         f"Created {len(chunks)} chunks"
     )
 
-    embeddings = OpenAIEmbeddings(
-        model=EMBEDDING_MODEL
-    )
-
     vectorstore = PineconeVectorStore.from_documents(
         documents=chunks,
-        embedding=embeddings,
-        collection_name="agentic-rag",
+        embedding=EMBEDDING_MODEL,
+        index_name="agentic-rag",
     )
 
     print("Vector store created.")
