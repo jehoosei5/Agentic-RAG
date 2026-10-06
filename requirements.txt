@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+
+langchain
+langchain-openai
+langchain-community
+langchain-pinecone
+langchain-text-splitters
+langgraph
+
+pinecone
+
+python-dotenv
+pydantic
+typing-extensions
