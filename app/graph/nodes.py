@@ -252,3 +252,57 @@ Documentation:
     return {
         "answer": response.content
     }
+
+def grade_answer(state):
+
+    question = state["question"]
+
+    answer = state["answer"]
+
+    documents = state.get(
+        "documents",
+        []
+    )
+
+    context = "\n\n".join(
+        doc.page_content
+        for doc in documents
+    )
+
+    structured_llm = llm.with_structured_output(
+        AnswerGrade
+    )
+
+    prompt = f"""
+You are an answer quality evaluator.
+
+Evaluate the generated answer.
+
+Question:
+
+{question}
+
+Retrieved documentation:
+
+{context}
+
+Generated answer:
+
+{answer}
+
+Determine:
+
+1. Is the answer grounded in the documentation?
+2. Does it actually answer the question?
+3. What should be improved?
+"""
+
+    result = structured_llm.invoke(
+        prompt
+    )
+
+    return {
+        "answer_grounded": result.grounded,
+        "answers_question": result.answers_question,
+        "grading_feedback": result.feedback,
+    }
