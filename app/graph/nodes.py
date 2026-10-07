@@ -1,5 +1,3 @@
-from langchain_openai import AzureChatOpenAI
-
 from langchain_core.messages import (
     SystemMessage,
     HumanMessage,
@@ -18,10 +16,7 @@ from app.retrieval.retrievers import (
 )
 
 
-llm = AzureChatOpenAI(
-    model=CHAT_MODEL,
-    temperature=0,
-)
+llm = CHAT_MODEL
 
 def analyze_query(state):
 
@@ -305,4 +300,68 @@ Determine:
         "answer_grounded": result.grounded,
         "answers_question": result.answers_question,
         "grading_feedback": result.feedback,
+    }
+
+
+def regenerate_answer(state):
+
+    feedback = state.get(
+        "grading_feedback",
+        ""
+    )
+
+    question = state["question"]
+
+    documents = state.get(
+        "documents",
+        []
+    )
+
+    context = "\n\n".join(
+        doc.page_content
+        for doc in documents
+    )
+
+    prompt = f"""
+Improve the previous answer using the grader feedback.
+
+Question:
+
+{question}
+
+Documentation:
+
+{context}
+
+Grader feedback:
+
+{feedback}
+
+Generate a new answer that:
+
+- directly answers the question
+- stays grounded in the documentation
+- avoids unsupported claims
+"""
+
+    response = llm.invoke(
+        prompt
+    )
+
+    return {
+        "answer": response.content,
+        "retry_count": (
+            state.get("retry_count", 0) + 1
+        ),
+    }
+
+
+def fallback(state):
+
+    return {
+        "answer": (
+            "I could not find enough relevant "
+            "information in the available documentation "
+            "to answer this question reliably."
+        )
     }
